@@ -1,0 +1,4 @@
+# A planilha oficial é privada e nunca deve ser publicada no GitHub Pages.
+*.xlsx
+~$*.xlsx
+__pycache__/

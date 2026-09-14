@@ -334,6 +334,13 @@
   .data-table tr:hover td { background: var(--bg3); }
   .data-table td.num { text-align: right; font-family: var(--mono); color: var(--text); }
   .data-table td.name { color: var(--text); font-weight: 500; }
+  .table-toolbar { display:flex; justify-content:flex-end; padding:0 0 12px; }
+  .table-search {
+    width:min(100%, 340px); padding:8px 11px; border-radius:8px;
+    border:1px solid var(--border2); background:var(--bg3); color:var(--text);
+    font:12px var(--font); outline:none;
+  }
+  .table-search:focus { border-color:var(--accent2); box-shadow:0 0 0 3px rgba(58,158,82,0.12); }
   .pill {
     display: inline-block; padding: 2px 10px; border-radius: 20px;
     font-size: 11px; font-weight: 500;
@@ -547,6 +554,7 @@
     </div>
     <div class="topbar-sep"></div>
     <div class="topbar-file" id="topbarFile">—</div>
+    <span class="update-badge" title="Verificação automática semanal"><span class="dot"></span>Domingos · 22h</span>
     <div class="topbar-sep" style="margin-left:8px"></div>
     <button class="btn-sm" onclick="toggleHistory()" id="btnHistory" title="Histórico de atualizações" style="padding:6px 10px">
       <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
@@ -736,7 +744,7 @@
       <div class="metrics-grid" id="diariasMetrics"></div>
       <div class="charts-row-2">
         <div class="card">
-          <div class="card-header"><div class="card-title">Diárias por servidor</div></div>
+          <div class="card-header"><div class="card-title">Diárias por beneficiário</div></div>
           <div class="chart-wrap" style="height:280px"><canvas id="diariasBarChart"></canvas></div>
         </div>
         <div class="card">
@@ -745,11 +753,12 @@
         </div>
       </div>
       <div class="card" style="margin-top:1rem">
-        <div class="card-header"><div class="card-title">Detalhamento de diárias — servidores</div></div>
+        <div class="card-header"><div class="card-title">Detalhamento de diárias — beneficiários</div></div>
+        <div class="table-toolbar"><input class="table-search" type="search" placeholder="Buscar beneficiário ou motivo…" aria-label="Buscar diárias" oninput="filterTable('diariasTableBody', this.value)"></div>
         <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
-              <th>Servidor</th>
+              <th>Beneficiário</th>
               <th>Motivo</th>
               <th style="text-align:right">Jan</th>
               <th style="text-align:right">Fev</th>
@@ -757,6 +766,12 @@
               <th style="text-align:right">Abr</th>
               <th style="text-align:right">Mai</th>
               <th style="text-align:right">Jun</th>
+              <th style="text-align:right">Jul</th>
+              <th style="text-align:right">Ago</th>
+              <th style="text-align:right">Set</th>
+              <th style="text-align:right">Out</th>
+              <th style="text-align:right">Nov</th>
+              <th style="text-align:right">Dez</th>
               <th style="text-align:right">Total</th>
             </tr></thead>
             <tbody id="diariasTableBody"></tbody>
@@ -793,6 +808,7 @@
           <div class="card-title">Despesas 2025 — completo</div>
           <div id="total2025badge" class="card-badge"></div>
         </div>
+        <div class="table-toolbar"><input class="table-search" type="search" placeholder="Buscar fornecedor ou serviço…" aria-label="Buscar despesas de 2025" oninput="filterTable('tabela2025Body', this.value)"></div>
         <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
@@ -818,6 +834,7 @@
           <div class="card-title">Despesas 2026 — em andamento</div>
           <div id="total2026badge" class="card-badge"></div>
         </div>
+        <div class="table-toolbar"><input class="table-search" type="search" placeholder="Buscar fornecedor ou serviço…" aria-label="Buscar despesas de 2026" oninput="filterTable('tabela2026Body', this.value)"></div>
         <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
@@ -981,6 +998,13 @@ function setPage(name) {
   if (tab)  tab.classList.add('active');
 }
 
+function filterTable(bodyId, query) {
+  const needle = String(query || '').toLocaleLowerCase('pt-BR').trim();
+  document.querySelectorAll(`#${bodyId} tr`).forEach(row => {
+    row.hidden = needle !== '' && !row.textContent.toLocaleLowerCase('pt-BR').includes(needle);
+  });
+}
+
 // ── data processing ──────────────────────────────────────────────────────────────
 function processWb(wb) {
 
@@ -1099,7 +1123,9 @@ function processWb(wb) {
   }
 
   const raw2025 = getSheet('Despesas 2025');
-  const raw2026 = getSheet('Despesas 2026');
+  const raw2026 = getSheet('Despesas Pagas 2026').length
+    ? getSheet('Despesas Pagas 2026')
+    : getSheet('Despesas 2026');
   const rows2025 = parseMainSheet(raw2025);
   const rows2026 = parseMainSheet(raw2026);
 
@@ -1116,7 +1142,7 @@ function processWb(wb) {
 
   // Orçamento
   let orcTotal = 7260758, orcCusteio = 4116750, orcAe = 2022472;
-  const rawOrc = getSheet('Orçamento');
+  const rawOrc = getSheet('Orçamento 2026');
   rawOrc.forEach(r => {
     if (!r[0]) return;
     const label = String(r[0]).toLowerCase();
@@ -1150,7 +1176,7 @@ function processWb(wb) {
 
   // Planned values from Planejamento sheet (col3 = 2026)
   const planMap = {};
-  const rawPlan = getSheet('Planejamento');
+  const rawPlan = getSheet('Planejamento 2026');
   rawPlan.forEach(r => {
     if (!r[0] || skip(String(r[0]))) return;
     const svc = String(r[1]||'').toLowerCase();
@@ -1182,19 +1208,20 @@ function processWb(wb) {
   // Parse diárias
   function parseDiarias(raw) {
     const rows = [];
-    for (const r of raw.slice(3)) {
+    let tipo = 'Servidor';
+    for (const r of raw.slice(2)) {
       if (!r) continue;
       const name = String(r[0]||'').trim();
+      if (name.toLowerCase().includes('colaboradores eventuais')) { tipo = 'Colaborador eventual'; continue; }
       if (!name || name.toUpperCase()==='NAN' || name.toUpperCase().includes('TOTAL')) continue;
-      const motivo = String(r[3]||'').trim();
-      const jan=pn(r[1]), fev=pn(r[5]), mar=pn(r[6]), abr=pn(r[7]), mai=pn(r[8]), jun=pn(r[9]);
-      const months=[jan,fev,mar,abr,mai,jun,0,0,0,0,0,0];
+      const motivo = String(r[1]||'').trim();
+      const months=Array.from({length:12},(_,i)=>pn(r[2+i]));
       const total=months.reduce((a,b)=>a+b,0);
-      if(total>0) rows.push({name,motivo,months,total});
+      if(total>0) rows.push({name,motivo,tipo,months,total});
     }
-    return rows;
+    return rows.sort((a,b)=>b.total-a.total);
   }
-  const diarias = parseDiarias(getSheet('Diárias Serv'));
+  const diarias = parseDiarias(getSheet('Diárias'));
 
   // Parse agua/energia 2026 from Coelba e Embasa sheet
   function parseCoelba(raw) {
@@ -1212,7 +1239,7 @@ function processWb(wb) {
     }
     return {a,e};
   }
-  const util2026 = parseCoelba(getSheet('Coelba e Embasa'));
+  const util2026 = parseCoelba(getSheet('ÀguaEnergia'));
 
   // Get agua/energia 2025 from main 2025 rows
   const agua2025=[0,0,0,0,0,0,0,0,0,0,0,0], ene2025=[0,0,0,0,0,0,0,0,0,0,0,0];
@@ -1240,12 +1267,13 @@ function processWb(wb) {
 // ── render ─────────────────────────────────────────────────
 function render(data, filename) {
   // Show data update date if available (set by template), otherwise show upload time
+  const source = data.sourceSheet ? ' · ' + data.sourceSheet : '';
   if (window._dataDate) {
-    document.getElementById('topbarFile').textContent = filename + ' · Atualizado em ' + window._dataDate;
+    document.getElementById('topbarFile').textContent = filename + source + ' · Atualizado em ' + window._dataDate;
   } else {
     const now = new Date();
     const ts = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-    document.getElementById('topbarFile').textContent = filename + ' · Carregado em ' + ts;
+    document.getElementById('topbarFile').textContent = filename + source + ' · Carregado em ' + ts;
   }
   const {
     total2025, total2026, orcTotal, orcCusteio, orcAe,
@@ -1333,8 +1361,8 @@ function render(data, filename) {
   }).join('');
 
   // ── PAGE: EXECUÇÃO ──────────────────────────────────────
-    const execAe = catTotals2026['Assistência Estudantil'] || 0;
-  const execCusteio = total2026 - execAe;
+  const execAe = data.execAe ?? (catTotals2026['Assistência Estudantil'] || 0);
+  const execCusteio = data.execCusteio ?? (total2026 - execAe);
   const pctCusteio = orcCusteio > 0 ? (execCusteio / orcCusteio * 100) : 0;
   const pctAe = orcAe > 0 ? (execAe / orcAe * 100) : 0;
   document.getElementById('execMetrics').innerHTML = `
@@ -1489,7 +1517,7 @@ function render(data, filename) {
       <div class="metric-value">${fmt(totalDiarias)}</div>
     </div>
     <div class="metric-card blue">
-      <div class="metric-label">Servidores</div>
+      <div class="metric-label">Beneficiários</div>
       <div class="metric-value">${[...new Set(diariasData.map(r=>r.name))].length}</div>
     </div>
     <div class="metric-card amber">
@@ -1497,11 +1525,11 @@ function render(data, filename) {
       <div class="metric-value">${diariasData.length ? fmtK(Math.max(...diariasData.map(r=>r.total))) : '—'}</div>
     </div>
     <div class="metric-card teal">
-      <div class="metric-label">Média por servidor</div>
+      <div class="metric-label">Média por beneficiário</div>
       <div class="metric-value">${diariasData.length ? fmtK(totalDiarias/[...new Set(diariasData.map(r=>r.name))].length) : '—'}</div>
     </div>`;
 
-  // Group by server name for bar chart
+  // Group by beneficiary name for bar chart
   const diariasMap = {};
   diariasData.forEach(r => { diariasMap[r.name] = (diariasMap[r.name]||0) + r.total; });
   const dNomes = Object.keys(diariasMap);
@@ -1532,7 +1560,7 @@ function render(data, filename) {
     <tr>
       <td class="name">${r.name}</td>
       <td style="color:var(--text2)">${r.motivo||'—'}</td>
-      ${r.months.slice(0,6).map(v=>`<td class="num" style="font-size:12px">${v>0?fmt(v):'—'}</td>`).join('')}
+      ${r.months.map(v=>`<td class="num" style="font-size:12px">${v>0?fmt(v):'—'}</td>`).join('')}
       <td class="num" style="font-weight:500">${fmt(r.total)}</td>
     </tr>`).join('');
 
@@ -2076,8 +2104,10 @@ function exportPDF() {
   const cats = {};
   d.catKeys.forEach((k,i) => { cats[k] = { color: d.catColors[i]||'#6b7280', keys:[] }; });
   const data = {
+    sourceSheet:d.sourceSheet||'',
     total2025:d.total2025, total2026:d.total2026,
     orcTotal:d.orcTotal, orcCusteio:d.orcCusteio, orcAe:d.orcAe,
+    execCusteio:d.execCusteio, execAe:d.execAe, execPnae:d.execPnae,
     month2025:d.month2025, month2026:d.month2026,
     catTotals2026:d.catTotals2026, catTotals2025:d.catTotals2025,
     planMap:d.planMap, cats:cats, suppliers:d.suppliers,
