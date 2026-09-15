@@ -929,6 +929,7 @@ function chartPrevistoLine() {
 // Standalone catOf for use in render() (Detalhes page)
 function catOf(service, cats) {
   const s = String(service||'').toLowerCase();
+  if (s.trim() === 'gás' || s.trim() === 'gas' || s.includes('gás de cozinha') || s.includes('gas de cozinha')) return 'Gás de Cozinha';
   const MAP = {
     'Serviços Terceirizados': ['terceirizad','vigilancia','apoio admin','segurança'],
     'Assistência Estudantil': ['paise','assist estudantil','auxílio','auxilio'],
@@ -1158,10 +1159,12 @@ function processWb(wb) {
     'Ração Animal':           { keys: ['ração','racao'], color: PALETTE[7] },
     'Materiais':              { keys: ['material','materiais','expedi','laborat','mat. limp','mat. lab','impressão','cópia','copia','gráfico','grafico','seguros','correios','divulgação','prossel'], color: PALETTE[8] },
     'Bolsas e Diárias':       { keys: ['pbiex','pbic','pibiex','monitoria','diaria','bolsa','ajuda de custo','visita técnica','visita tecnica','visitas técnicas','viagem','eventos estudantis'], color: PALETTE[9] },
+    'Gás de Cozinha':           { keys: [], color: '#f97316' },
     'Outros':                 { keys: [], color: '#6b7280' },
   };
   function catOf(service) {
     const s = String(service||'').toLowerCase();
+  if (s.trim() === 'gás' || s.trim() === 'gas' || s.includes('gás de cozinha') || s.includes('gas de cozinha')) return 'Gás de Cozinha';
     for (const [name, conf] of Object.entries(cats)) {
       if (conf.keys && conf.keys.length > 0 && conf.keys.some(k => s.includes(k))) return name;
     }
@@ -1719,6 +1722,7 @@ function render(data, filename) {
     { nome:'Manutenção e Materiais', cats:['Materiais de Construção','Materiais','Ração Animal'] },
     { nome:'Assistência Estudantil', cats:['Assistência Estudantil','Alimentação'] },
     { nome:'Bolsas e Diárias',       cats:['Bolsas e Diárias'] },
+    { nome:'Gás de Cozinha',           cats:['Gás de Cozinha'] },
     { nome:'Outros',                 cats:['Outros'] },
   ];
 
