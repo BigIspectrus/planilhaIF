@@ -25,7 +25,7 @@ CATEGORIES = {
     "Energia Elétrica": ["energia", "coelba", "eletric"],
     "Água e Saneamento": ["agua", "embasa", "saneamento", "potavel"],
     "Combustível & Veículos": ["combust", "veiculo", "frota", "licenciamento"],
-    "Manutenção Predial": ["predial", "construc", "ar condicion", "dedetiz", "extintor", "recarga"],
+    "Materiais de Construção": ["predial", "construc", "ar condicion", "dedetiz", "extintor", "recarga"],
     "Ração Animal": ["racao"],
     "Materiais": ["material", "materiais", "expedi", "laborat", "mat. limp", "mat. lab", "impressao", "copia", "grafico", "seguro", "correio", "divulgacao", "prossel"],
     "Bolsas e Diárias": ["pbiex", "pbic", "pibiex", "monitoria", "diaria", "bolsa", "ajuda de custo", "visita tecnica", "viagem", "eventos estudantis"],
