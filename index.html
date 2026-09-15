@@ -1311,12 +1311,10 @@ function render(data, filename) {
 
   // Overview month chart
   document.getElementById('ovMonthLegend').innerHTML =
-    `<div class="legend-item"><div class="legend-dot" style="background:#2a7d3f"></div>2025</div>
-     <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div>2026</div>`;
+    `<div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div>2026</div>`;
   mkChart('ovMonthChart','bar',{
     labels: MONTHS,
     datasets:[
-      { label:'2025', data: month2025, backgroundColor:'rgba(42,125,63,0.3)', borderColor:'#2a7d3f', borderWidth:1, borderRadius:3 },
       { label:'2026', data: month2026.map(v => v||null), backgroundColor:chartColor(1,0.5), borderColor:chartColor(1), borderWidth:1, borderRadius:3 }
     ]
   },{
