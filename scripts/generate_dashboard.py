@@ -16,7 +16,7 @@ from openpyxl import load_workbook
 
 PALETTE = [
     "#2a7d3f", "#c0392b", "#e6a817", "#6d4c9e", "#1a8c6e",
-    "#3a9e52", "#d35400", "#8e44ad", "#1a7a6e", "#b7950b",
+    "#3a9e52", "#d35400", "#8e44ad", "#1a7a6e", "#b7950b", "#f97316",
 ]
 CATEGORIES = {
     "Serviços Terceirizados": ["terceirizad", "vigilancia", "apoio admin", "seguranca", "conservacao"],
@@ -29,6 +29,7 @@ CATEGORIES = {
     "Ração Animal": ["racao"],
     "Materiais": ["material", "materiais", "expedi", "laborat", "mat. limp", "mat. lab", "impressao", "copia", "grafico", "seguro", "correio", "divulgacao", "prossel"],
     "Bolsas e Diárias": ["pbiex", "pbic", "pibiex", "monitoria", "diaria", "bolsa", "ajuda de custo", "visita tecnica", "viagem", "eventos estudantis"],
+    "Gás de Cozinha": [],
     "Outros": [],
 }
 
@@ -111,6 +112,9 @@ def parse_expenses(sheet, *, drop_embedded_rp: bool = False) -> list[dict]:
 
 def category(service: str, name: str = "") -> str:
     text = norm(f"{name} {service}")
+    service_text = norm(service)
+    if service_text == "gas" or "gas de cozinha" in text:
+        return "Gás de Cozinha"
     if any(key in text for key in ["aliment", "refeit", "cestas", "generos", "pnae"]):
         return "Alimentação"
     if "materiais eletric" in text:
