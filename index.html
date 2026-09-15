@@ -601,12 +601,6 @@
     <div class="nav-tab" onclick="setPage('execucao')" id="tab-execucao">
       <div class="tab-dot" style="background:#3a9e52"></div>Execução Orçamentária
     </div>
-    <div class="nav-tab" onclick="setPage('comparativo')" id="tab-comparativo">
-      <div class="tab-dot" style="background:#c0392b"></div>Executado 2025 x 2026
-    </div>
-    <div class="nav-tab" onclick="setPage('diarias')" id="tab-diarias">
-      <div class="tab-dot" style="background:#9b72c8"></div>Diárias
-    </div>
     <div class="nav-tab" onclick="setPage('utilities')" id="tab-utilities">
       <div class="tab-dot" style="background:#1a8c6e"></div>Água & Luz
     </div>
@@ -2029,8 +2023,8 @@ function showError(title, detail, hint) {
 // Override the alert inside loadFile with friendly error
 
 
-const PRESENT_PAGES = ['overview','execucao','comparativo','diarias','utilities','tabela2025','tabela2026','catexec','planejamento'];
-const PRESENT_LABELS = ['Visão Geral','Execução Orçamentária','Executado 2025 x 2026','Diárias','Água & Luz','Executado 2025','Executado 2026','Por Categoria','Planejamento 2026'];
+const PRESENT_PAGES = ['overview','execucao','utilities','tabela2025','tabela2026','catexec','planejamento'];
+const PRESENT_LABELS = ['Visão Geral','Execução Orçamentária','Água & Luz','Executado 2025','Executado 2026','Por Categoria','Planejamento 2026'];
 let presentIdx = 0;
 
 function updatePresentNav() {
